@@ -24,6 +24,7 @@ class Bodyparts extends JPanel {
     public void paintBody(int mistake_num) {
         mistake_number = mistake_num;
     }
+
     @Override
     public void paint(Graphics g) {
         /*parts drawing*/
@@ -74,7 +75,7 @@ class Hangman extends JFrame {
     private JTextField[] letter = new JTextField[ww.length()];
     private JTextField guess;
     private JButton submit;
-    public static String ww = "HELLO";
+    public static String ww = new Setofwords().getWord();
     Bodyparts bp;
 
     public Hangman() {
@@ -175,6 +176,7 @@ class Hangman extends JFrame {
             repaint();
         }
     }
+
     public static void main(String[] args) {
         Hangman l = new Hangman();
         l.setSize(750, 563);
