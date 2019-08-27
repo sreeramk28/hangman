@@ -17,6 +17,8 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
+import java.util.Random;
+
 class Bodyparts extends JPanel {
 
     int mistake_number;
@@ -72,15 +74,30 @@ class Hangman extends JFrame {
     private JLabel mist, over;
     private JPanel jp, jp1;
     private JTextField mistake_count;
-    private JTextField[] letter = new JTextField[ww.length()];
+    private JTextField[] letter;
     private JTextField guess;
     private JButton submit;
-    public static String ww = new Setofwords().getWord();
+    public static String ww;
     Bodyparts bp;
+	String[] words = new String[10];
 
     public Hangman() {
-
-        submit = new JButton("GUESS");
+		
+	    words[0] = "INDIA";
+        words[1] = "AUSTRALIA";
+        words[2] = "SOUTH_AFRICA";
+        words[3] = "JAPAN";
+        words[4] = "CHINA";
+        words[5] = "CANADA";
+        words[6] = "MALDIVES";
+        words[7] = "ZIMBABWE";
+        words[8] = "PORTUGAL";
+        words[9] = "RUSSIA";
+        
+		ww = getWord();
+		
+		letter = new JTextField[ww.length()];
+		submit = new JButton("GUESS");
         jp = new JPanel();
         jp1 = new JPanel();
         mist = new JLabel("Mistakes");
@@ -176,7 +193,14 @@ class Hangman extends JFrame {
             repaint();
         }
     }
-
+	
+	public String getWord() {
+        Random rand = new Random();
+        int i;
+        i = rand.nextInt(10);
+        return words[i];
+    }
+	
     public static void main(String[] args) {
         Hangman l = new Hangman();
         l.setSize(750, 563);
