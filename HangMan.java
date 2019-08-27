@@ -71,7 +71,7 @@ class Bodyparts extends JPanel {
 class Hangman extends JFrame {
 
     public static Integer num_mistakes = 0;
-    private JLabel mist, over;
+    private JLabel mist, over, clue;
     private JPanel jp, jp1;
     private JTextField mistake_count;
     private JTextField[] letter;
@@ -79,29 +79,24 @@ class Hangman extends JFrame {
     private JButton submit;
     public static String ww;
     Bodyparts bp;
-	String[] words = new String[10];
-
+	private String[][] words = {{"INDIA","AUSTRALIA","SOUTH_AFRICA","JAPAN","CHINA","CANADA","MALDIVES","ZIMBABWE","PORTUGAL","RUSSIA","UNITED_STATES_OF_AMERICA","MEXICO","ARGENTINA","BRAZIL","CHILE","MAURITIUS","PERU","HONDURAS","BOLIVIA","CUBA","HAITI","ICELAND","GERMANY","POLAND","GREECE"},
+		{"FACEBOOK","APPLE","AMAZON","NETFLIX","GOOGLE","YAHOO","XEROX","INFOSYS","TATA","LENOVO","DELL","HEWLETT-PACKARD","SONY","SAMSUNG","NOKIA","WHATSAPP","YOUTUBE"},
+		{"LONDON","PARIS","DUBAI","SINGAPORE","CHENNAI","VENICE","PRAGUE","LISBON","AMSTERDAM","FLORENCE","ROME","BUDAPEST","BRUGES"},
+		{"THE_LION_KING","THE_GODFATHER","CITIZEN_KANE","THE_SHAWSHANK_REDEMPTION","THE_SHAPE_OF_WATER","INCEPTION","TITANIC","AVATAR","THE_LAST_AIRBENDER","AVENGERS_ENDGAME","LA_LA_LAND","THE_DARK_NIGHT","THE_TIME_MACHINE"},
+		{"MICHEAL_JACKSON","JEFF_BEZOS","ELON_MUSK","LINUS_TORVALDS","DONALD_TRUMP","NARENDRA_MODI","SATYA_NADELLA","SUNDAR_PICHAI","LARRY_PAGE","ROGER_FEDERER","RAFAEL_NADAL"},
+		{"PRUDENT","ROBUST","MISCELLANEOUS"}} ;
+	private String[] categories = {"COUNTRY", "COMPANY", "CITY", "MOVIES", "FAMOUS PERSONALITIES", "MISCELLANEOUS"};
     public Hangman() {
-		
-	    words[0] = "INDIA";
-        words[1] = "AUSTRALIA";
-        words[2] = "SOUTH_AFRICA";
-        words[3] = "JAPAN";
-        words[4] = "CHINA";
-        words[5] = "CANADA";
-        words[6] = "MALDIVES";
-        words[7] = "ZIMBABWE";
-        words[8] = "PORTUGAL";
-        words[9] = "RUSSIA";
         
+		clue = new JLabel("");
 		ww = getWord();
-		
 		letter = new JTextField[ww.length()];
 		submit = new JButton("GUESS");
         jp = new JPanel();
         jp1 = new JPanel();
         mist = new JLabel("Mistakes");
         over = new JLabel("");
+		
         over.setHorizontalAlignment(JLabel.LEFT);
         mistake_count = new JTextField(5);
         mistake_count.setHorizontalAlignment(JTextField.RIGHT);
@@ -110,17 +105,20 @@ class Hangman extends JFrame {
         guess = new JTextField(2);
         guess.setHorizontalAlignment(JTextField.RIGHT);
         guess.setEditable(true);
-
+		
         for (int u = 0; u < ww.length(); u++) {
             letter[u] = new JTextField(2);
             letter[u].setHorizontalAlignment(JTextField.LEFT);
             letter[u].setEditable(false);
         }
         submit.addActionListener(new ListenToSubmit());
-        for (int u = 0; u < ww.length(); u++) {
+        jp1.add(clue);
+		for (int u = 0; u < ww.length(); u++) {
             jp1.add(letter[u]);
         }
-        jp1.add(mist);
+		clue.setHorizontalAlignment(JLabel.RIGHT);
+        
+		jp1.add(mist);
         jp1.add(mistake_count);
         jp1.add(over);
         jp.add(guess);
@@ -170,6 +168,10 @@ class Hangman extends JFrame {
                 repaint();
                 if (num_mistakes == 6) {
                     over.setText("GAME OVER, YOU LOST!");
+					for(int i=0; i<ww.length(); i++) {
+						p = "";
+						letter[i].setText(p += ww.charAt(i));
+					}	
                     submit.setVisible(false);
                     guess.setVisible(false);
                 }
@@ -196,14 +198,16 @@ class Hangman extends JFrame {
 	
 	public String getWord() {
         Random rand = new Random();
-        int i;
-        i = rand.nextInt(10);
-        return words[i];
+        int i,j;
+        i = rand.nextInt(categories.length);
+		j = rand.nextInt(words[i].length);
+		clue.setText(categories[i]);
+        return words[i][j];
     }
 	
     public static void main(String[] args) {
         Hangman l = new Hangman();
-        l.setSize(750, 563);
+        l.setSize(1000, 563);
         l.setLocationRelativeTo(null);
         l.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         l.setVisible(true);
