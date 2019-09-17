@@ -76,22 +76,32 @@ class Hangman extends JFrame {
     private JTextField mistake_count;
     private JTextField[] letter;
     private JTextField guess;
-    private JButton submit;
+    private JButton submit,replay;
     public static String ww;
     Bodyparts bp;
-	private String[][] words = {{"INDIA","AUSTRALIA","SOUTH_AFRICA","JAPAN","CHINA","CANADA","MALDIVES","ZIMBABWE","PORTUGAL","RUSSIA","UNITED_STATES_OF_AMERICA","MEXICO","ARGENTINA","BRAZIL","CHILE","MAURITIUS","PERU","HONDURAS","BOLIVIA","CUBA","HAITI","ICELAND","GERMANY","POLAND","GREECE"},
-		{"FACEBOOK","APPLE","AMAZON","NETFLIX","GOOGLE","YAHOO","XEROX","INFOSYS","TATA","LENOVO","DELL","HEWLETT-PACKARD","SONY","SAMSUNG","NOKIA","WHATSAPP","YOUTUBE"},
-		{"LONDON","PARIS","DUBAI","SINGAPORE","CHENNAI","VENICE","PRAGUE","LISBON","AMSTERDAM","FLORENCE","ROME","BUDAPEST","BRUGES"},
-		{"THE_LION_KING","THE_GODFATHER","CITIZEN_KANE","THE_SHAWSHANK_REDEMPTION","THE_SHAPE_OF_WATER","INCEPTION","TITANIC","AVATAR","THE_LAST_AIRBENDER","AVENGERS_ENDGAME","LA_LA_LAND","THE_DARK_NIGHT","THE_TIME_MACHINE"},
-		{"MICHEAL_JACKSON","JEFF_BEZOS","ELON_MUSK","LINUS_TORVALDS","DONALD_TRUMP","NARENDRA_MODI","SATYA_NADELLA","SUNDAR_PICHAI","LARRY_PAGE","ROGER_FEDERER","RAFAEL_NADAL"},
-		{"PRUDENT","ROBUST","MISCELLANEOUS"}} ;
-	private String[] categories = {"COUNTRY", "COMPANY", "CITY", "MOVIES", "FAMOUS PERSONALITIES", "MISCELLANEOUS"};
+	private String[][] words = 
+	{{"INDIA","AUSTRALIA","SOUTH_AFRICA","JAPAN","CHINA","CANADA","MALDIVES","ZIMBABWE","PORTUGAL","RUSSIA","UNITED_STATES_OF_AMERICA","MEXICO","ARGENTINA","BRAZIL","CHILE","MAURITIUS","PERU","HONDURAS","BOLIVIA","CUBA","HAITI","ICELAND","GERMANY","POLAND","GREECE"}
+
+		,{"FACEBOOK","APPLE","AMAZON","NETFLIX","GOOGLE","YAHOO","XEROX","INFOSYS","TATA","LENOVO","DELL","HEWLETT-PACKARD","SONY","SAMSUNG","NOKIA","WHATSAPP","YOUTUBE","ONE_PLUS","NESTLE","ONIDA"}
+
+			,{"LONDON","PARIS","DUBAI","SINGAPORE","CHENNAI","VENICE","PRAGUE","LISBON","AMSTERDAM","FLORENCE","ROME","BUDAPEST","BRUGES","HANGZHOU","CHONGQING","ZHENGZHOU","HIROSHIMA","NAGASAKI","SAITAMA"}
+
+				,{"THE_LION_KING","THE_GODFATHER","CITIZEN_KANE","THE_SHAWSHANK_REDEMPTION","THE_SHAPE_OF_WATER","INCEPTION","TITANIC","AVATAR","THE_LAST_AIRBENDER","AVENGERS_ENDGAME","LA_LA_LAND","THE_DARK_KNIGHT","THE_TIME_MACHINE"}
+
+					,{"MICHEAL_JACKSON","JEFF_BEZOS","ELON_MUSK","LINUS_TORVALDS","DONALD_TRUMP","NARENDRA_MODI","SATYA_NADELLA","SUNDAR_PICHAI","LARRY_PAGE","ROGER_FEDERER","RAFAEL_NADAL","WILLIAM_SHAKESPEARE"}
+
+						,{"GRAND_THEFT_AUTO","GOD_OF_WAR","ASSASSINS_CREED","NEED_FOR_SPEED","RED_DEAD_REDEMPTION","PRINCE_OF_PERSIA","MORTAL_KOMBAT","FORTNITE","APEX_LEGENDS","CALL_OF_DUTY","ANTHEM","FAR_CRY","PUBG","WOLFENSTEIN","THE_WITCHER","FIFA","SUPER_MARIO","DONKEY_KONG","SKYRIM","CIRCUS_CHARLIE"}
+
+	,{"PRUDENT","ROBUST","MISCELLANEOUS","BROWSING","SPLICING","POLLINATION","PHOTOSYNTHESIS","SORTING","TIME_TRAVEL","MYSTERIOUS","SOS","CERTIFICATION","RECOGNITION","POPULATION","CENSUS"}};
+	private String[] categories = {"COUNTRY", "COMPANY", "CITY", "MOVIES", "FAMOUS PERSONALITIES", "VIDEO GAMES", "MISCELLANEOUS"};
     public Hangman() {
         
+		num_mistakes = 0;
 		clue = new JLabel("");
 		ww = getWord();
 		letter = new JTextField[ww.length()];
 		submit = new JButton("GUESS");
+		replay = new JButton("REPLAY");
         jp = new JPanel();
         jp1 = new JPanel();
         mist = new JLabel("Mistakes");
@@ -112,6 +122,7 @@ class Hangman extends JFrame {
             letter[u].setEditable(false);
         }
         submit.addActionListener(new ListenToSubmit());
+		replay.addActionListener(new ListenToReplay(this));
         jp1.add(clue);
 		for (int u = 0; u < ww.length(); u++) {
             jp1.add(letter[u]);
@@ -123,6 +134,7 @@ class Hangman extends JFrame {
         jp1.add(over);
         jp.add(guess);
         jp.add(submit);
+		jp.add(replay);
         add(jp1, BorderLayout.NORTH);
         add(jp, BorderLayout.SOUTH);
         bp = new Bodyparts();
@@ -174,8 +186,10 @@ class Hangman extends JFrame {
 					}	
                     submit.setVisible(false);
                     guess.setVisible(false);
+					//replay.setVisible(true);
                 }
-            } else {
+            } 
+			else {
                 for (int i = 0; i < k; i++) {
                     p = "";
                     letter[pos[i]].setText(p += let);
@@ -190,14 +204,38 @@ class Hangman extends JFrame {
                     over.setText("CONGRATS, YOU WON!!");
                     submit.setVisible(false);
                     guess.setVisible(false);
+					//replay.setVisible(true);
                 }
             }
+			guess.setText("");
             repaint();
+			
         }
     }
 	
+	class ListenToReplay implements ActionListener {
+
+        
+        public ListenToReplay(Hangman h) {
+		
+			h.setVisible(false);
+			
+		}
+		@Override
+		public void actionPerformed(ActionEvent ae) {
+            //frame.dispose();
+			System.out.println("SIKE");
+			Hangman l = new Hangman();
+			l.setSize(1000, 563);
+			l.setLocationRelativeTo(null);
+			l.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			l.setVisible(true);
+        }
+	
+    }
+	
 	public String getWord() {
-        Random rand = new Random();
+        Random rand = new Random(System.currentTimeMillis());
         int i,j;
         i = rand.nextInt(categories.length);
 		j = rand.nextInt(words[i].length);
