@@ -6,7 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-
+import java.io.IOException;
+import java.lang.ClassNotFoundException;
 import java.util.Random;
 
 class Menu extends JFrame {
@@ -17,6 +18,7 @@ class Menu extends JFrame {
         checkhistory = new JButton("VIEW PROGRESS");
         exit = new JButton("EXIT");
         newgame.addActionListener(new ListentoNewGame());
+		checkhistory.addActionListener(new ListentoViewProgress());
 		p1 = new JPanel();
         p1.add(newgame);
         p1.add(checkhistory);
@@ -25,17 +27,27 @@ class Menu extends JFrame {
     }
     class ListentoNewGame implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent ae) {
-            new Player().startGame();
+        public void actionPerformed(ActionEvent ae)  {
+            try {
+				try {
+				new Player().startGame(); 
+				}
+				catch (IOException ie) {
+					System.out.println("IOE");
+				}	
+			}
+			catch (ClassNotFoundException cnfe) {
+				System.out.println("CNFE");
+			}	
         }
     }
-    /*class ListentoViewProgress implements ActionListener {
+    class ListentoViewProgress implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
             (new Player()).saveGame();
         }
     }
-    class ListentoExit implements ActionListener {
+    /*class ListentoExit implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
             new Player.exitGame();
@@ -101,6 +113,9 @@ class GamePlay extends JFrame {
     private JButton submit,replay;
     public static String ww;
     Bodyparts bp;
+	public static int getMistakeCount() {
+		return num_mistakes;
+	}
 	public GamePlay(String w, String cat) {
         this.ww = w;
 		num_mistakes = 0;
@@ -215,6 +230,18 @@ class GamePlay extends JFrame {
 		}
 	 }	
 }
+class Dialog extends JFrame {
+	JLabel L;
+	public Dialog(Integer mis) {
+		String s1 = "Score = ";
+		Integer val = 6 - mis;
+		String s = val.toString();
+		s1 += s;
+		L = new JLabel("");
+		L.setText(s1);
+		add(L);
+	}
+}	
 class Player
 {
 	private String name;
@@ -223,14 +250,19 @@ class Player
 	    name = "";
 	}
 	
-	void startGame() {
+	void startGame() throws IOException, ClassNotFoundException {
 	    // CREATE GAME OBJECT
 		Game gm = new Game();
 		gm.playGame();
 	}
 	
-	void getHistory() {
-	    
+	void saveGame() {
+	    int mistakes = GamePlay.getMistakeCount();
+		Dialog db = new Dialog(mistakes);
+		db.setSize(150, 150);
+        db.setLocationRelativeTo(null);
+        db.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        db.setVisible(true);
 	}
 }
 
@@ -253,15 +285,14 @@ class Game {
 		}
 		return k;
 	}
-    public void playGame() {
+    public void playGame() throws IOException, ClassNotFoundException {
 		mistakes_count = 0;
         // LOGIC FOR EVERYTHING + compute score
 		//get word, send it to ui for squares filling
 		//get the guess, get score and all
-		SetofWords sow = new SetofWords();
-		thecategoryidx = sow.getCategoryIndex();
-		thecategory = sow.getCategory(thecategoryidx);
-		theword = sow.getWord(thecategoryidx);
+		SocketServerExample sse = new SocketServerExample();
+		thecategory = sse.retCategory();
+		theword = sse.retWord();
 		GamePlay ui = new GamePlay(theword, thecategory);
 		ui.setSize(1000, 563);
         ui.setLocationRelativeTo(null);
@@ -280,44 +311,7 @@ class Game {
     }
 }
 
-class SetofWords {
-    // SET OF WORDS RIGHT HERE OR GET IT FROM ANOTHER PROGRAM
-	private String[][] words = 
-	{{"INDIA","AUSTRALIA","SOUTH_AFRICA","JAPAN","CHINA","CANADA","MALDIVES","ZIMBABWE","PORTUGAL","RUSSIA","UNITED_STATES_OF_AMERICA","MEXICO","ARGENTINA","BRAZIL","CHILE","MAURITIUS","PERU","HONDURAS","BOLIVIA","CUBA","HAITI","ICELAND","GERMANY","POLAND","GREECE"}
 
-		,{"FACEBOOK","APPLE","AMAZON","NETFLIX","GOOGLE","YAHOO","XEROX","INFOSYS","TATA","LENOVO","DELL","HEWLETT-PACKARD","SONY","SAMSUNG","NOKIA","WHATSAPP","YOUTUBE","ONE_PLUS","NESTLE","ONIDA"}
-
-			,{"LONDON","PARIS","DUBAI","SINGAPORE","CHENNAI","VENICE","PRAGUE","LISBON","AMSTERDAM","FLORENCE","ROME","BUDAPEST","BRUGES","HANGZHOU","CHONGQING","ZHENGZHOU","HIROSHIMA","NAGASAKI","SAITAMA"}
-
-				,{"THE_LION_KING","THE_GODFATHER","CITIZEN_KANE","THE_SHAWSHANK_REDEMPTION","THE_SHAPE_OF_WATER","INCEPTION","TITANIC","AVATAR","THE_LAST_AIRBENDER","AVENGERS_ENDGAME","LA_LA_LAND","THE_DARK_KNIGHT","THE_TIME_MACHINE"}
-
-					,{"MICHEAL_JACKSON","JEFF_BEZOS","ELON_MUSK","LINUS_TORVALDS","DONALD_TRUMP","NARENDRA_MODI","SATYA_NADELLA","SUNDAR_PICHAI","LARRY_PAGE","ROGER_FEDERER","RAFAEL_NADAL","WILLIAM_SHAKESPEARE"}
-
-						,{"GRAND_THEFT_AUTO","GOD_OF_WAR","ASSASSINS_CREED","NEED_FOR_SPEED","RED_DEAD_REDEMPTION","PRINCE_OF_PERSIA","MORTAL_KOMBAT","FORTNITE","APEX_LEGENDS","CALL_OF_DUTY","ANTHEM","FAR_CRY","PUBG","WOLFENSTEIN","THE_WITCHER","FIFA","SUPER_MARIO","DONKEY_KONG","SKYRIM","CIRCUS_CHARLIE"}
-
-	,{"PRUDENT","ROBUST","MISCELLANEOUS","BROWSING","SPLICING","POLLINATION","PHOTOSYNTHESIS","SORTING","TIME_TRAVEL","MYSTERIOUS","SOS","CERTIFICATION","RECOGNITION","POPULATION","CENSUS"}};
-	private String[] categories = {"COUNTRY", "COMPANY", "CITY", "MOVIES", "FAMOUS PERSONALITIES", "VIDEO GAMES", "MISCELLANEOUS"};
-    /*public SetofWords() {
-        
-    }*/
-    public String getWord(int i) {
-        //GENERATE RANDOM WORDS FROM SET OF WORDS
-        //i = rand.nextInt(categories.length);
-		Random rand = new Random(System.currentTimeMillis());
-		int j = rand.nextInt(words[i].length);
-		
-		//clue.setText(categories[i]);
-        return words[i][j]; 
-    }
-	public int getCategoryIndex() {
-		Random rand = new Random(System.currentTimeMillis());
-		int i = rand.nextInt(categories.length);
-		return i;
-	}	
-	public String getCategory(int i) {
-		return categories[i];
-	}
-}
 public class Hangman {
     public static void main(String[] args) {
         // create menu object and kick things off!!
