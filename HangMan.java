@@ -9,7 +9,9 @@ import java.awt.geom.Line2D;
 import java.io.IOException;
 import java.lang.ClassNotFoundException;
 import java.util.Random;
-
+class GlobalScore {
+	public static Integer score = 0;
+}	
 class Menu extends JFrame {
     JPanel p1;
     JButton newgame, checkhistory, exit;
@@ -19,6 +21,7 @@ class Menu extends JFrame {
         exit = new JButton("EXIT");
         newgame.addActionListener(new ListentoNewGame());
 		checkhistory.addActionListener(new ListentoViewProgress());
+		exit.addActionListener(new ListentoExit());
 		p1 = new JPanel();
         p1.add(newgame);
         p1.add(checkhistory);
@@ -47,12 +50,12 @@ class Menu extends JFrame {
             (new Player()).saveGame();
         }
     }
-    /*class ListentoExit implements ActionListener {
+    class ListentoExit implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent ae) {
-            new Player.exitGame();
+			System.exit(0);
         }
-    }*/
+    }
 }
 class Bodyparts extends JPanel {
 
@@ -103,14 +106,14 @@ class Bodyparts extends JPanel {
     }
 }
 class GamePlay extends JFrame {
-    // COPY FROM HANGMAN FRAME IN REPO WITH LITTLE TWEAKS
+    // FROM HANGMAN FRAME IN LAYERED BRANCH WITH LITTLE TWEAKS
 	public static Integer num_mistakes = 0;
     private JLabel mist, over, clue;
     private JPanel jp, jp1;
     private JTextField mistake_count;
     private JTextField[] letter;
     private JTextField guess;
-    private JButton submit,replay;
+    private JButton submit;
     public static String ww;
     Bodyparts bp;
 	public static int getMistakeCount() {
@@ -124,7 +127,6 @@ class GamePlay extends JFrame {
 		//ww = new SetofWords().getWord();
 		letter = new JTextField[ww.length()];
 		submit = new JButton("GUESS");
-		replay = new JButton("REPLAY");
         jp = new JPanel();
         jp1 = new JPanel();
         mist = new JLabel("Mistakes");
@@ -145,7 +147,7 @@ class GamePlay extends JFrame {
             letter[u].setEditable(false);
         }
         submit.addActionListener(new ListenToSubmit());
-		//replay.addActionListener(new ListenToReplay(this));
+
         jp1.add(clue);
 		for (int u = 0; u < ww.length(); u++) {
             jp1.add(letter[u]);
@@ -157,7 +159,6 @@ class GamePlay extends JFrame {
         jp1.add(over);
         jp.add(guess);
         jp.add(submit);
-		jp.add(replay);
         add(jp1, BorderLayout.NORTH);
         add(jp, BorderLayout.SOUTH);
         bp = new Bodyparts();
@@ -189,8 +190,6 @@ class GamePlay extends JFrame {
             //int k = 0;
             char let = guess.getText().charAt(0);
             f = Game.checkPresence(let, pos);
-			
-			//System.out.println(pos.length); System.out.println();
 			if(f == -1) {
 				num_mistakes++;
                 mistake_count.setText(num_mistakes.toString());
@@ -211,7 +210,6 @@ class GamePlay extends JFrame {
 				for (int i = 0; i <= f; i++) {
                     p = "";
                     letter[pos[i]].setText(p += let);
-					//System.out.println("Hello");
                 }
 				int ll = 0;
                 for (int u = 0; u < ww.length(); u++) {
@@ -222,7 +220,6 @@ class GamePlay extends JFrame {
                     over.setText("CONGRATS, YOU WON!!");
                     submit.setVisible(false);
                     guess.setVisible(false);
-					//replay.setVisible(true);
                 }
 			}
 			guess.setText("");
@@ -231,15 +228,25 @@ class GamePlay extends JFrame {
 	 }	
 }
 class Dialog extends JFrame {
-	JLabel L;
+	JLabel L, SL;
+	JPanel p1;
 	public Dialog(Integer mis) {
-		String s1 = "Score = ";
+		p1 = new JPanel();
+		String s1 = "| Game Score = ";
+		String s2 = "Session Score = ";
 		Integer val = 6 - mis;
-		String s = val.toString();
+		GlobalScore.score += val;
+		String s = val.toString() + " | ";
+		String z = (GlobalScore.score).toString() + " | ";
 		s1 += s;
+		s2 += z;
 		L = new JLabel("");
 		L.setText(s1);
-		add(L);
+		SL = new JLabel("");
+		SL.setText(s2);
+		p1.add(L);
+		p1.add(SL);
+		add(p1);
 	}
 }	
 class Player
@@ -259,9 +266,9 @@ class Player
 	void saveGame() {
 	    int mistakes = GamePlay.getMistakeCount();
 		Dialog db = new Dialog(mistakes);
-		db.setSize(150, 150);
+		db.setSize(450, 450);
         db.setLocationRelativeTo(null);
-        db.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        db.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         db.setVisible(true);
 	}
 }
@@ -287,7 +294,6 @@ class Game {
 	}
     public void playGame() throws IOException, ClassNotFoundException {
 		mistakes_count = 0;
-        // LOGIC FOR EVERYTHING + compute score
 		//get word, send it to ui for squares filling
 		//get the guess, get score and all
 		SocketServerExample sse = new SocketServerExample();
@@ -296,21 +302,10 @@ class Game {
 		GamePlay ui = new GamePlay(theword, thecategory);
 		ui.setSize(1000, 563);
         ui.setLocationRelativeTo(null);
-        ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         ui.setVisible(true);
     }
-    
-    public void saveGame() {
-        // save the score and words played in file
-        // close the files
-		;
-    }
-    public void exitGame() {
-        // save the game and exit
-		;
-    }
 }
-
 
 public class Hangman {
     public static void main(String[] args) {
@@ -318,7 +313,7 @@ public class Hangman {
 		Menu l = new Menu();
 		l.setSize(1000, 563);
         l.setLocationRelativeTo(null);
-        l.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        l.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         l.setVisible(true);
     }
 }
