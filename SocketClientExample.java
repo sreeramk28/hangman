@@ -64,7 +64,6 @@ public class SocketClientExample {
             System.out.println("Sending request to Socket Server");
             if(i == 0) oos.writeObject(categorie);
 			else if(i == 1) oos.writeObject(theword);
-			else if(i == 2) oos.writeObject("exit");
             //read the server response message
             ois = new ObjectInputStream(socket.getInputStream());
             String message = (String) ois.readObject();
