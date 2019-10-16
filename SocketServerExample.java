@@ -22,8 +22,8 @@ public class SocketServerExample {
     public SocketServerExample() throws IOException, ClassNotFoundException{
         //create the socket server object
         server = new ServerSocket(port);
-        //keep listens indefinitely until receives 'exit' call or program terminates
         for(int i=0; i<2; i++) {
+			System.out.println("....Connected....");
             if(i == 0) 
 				System.out.println("...Receiving Category...");
 			else if(i == 1) {
@@ -53,11 +53,8 @@ public class SocketServerExample {
             ois.close();
             oos.close();
             socket.close();
-            //terminate the server if client sends exit request
-            //if(message.equalsIgnoreCase("exit")) break;
         }
-        System.out.println("Shutting down Socket server!!");
-        //close the ServerSocket object
+        System.out.println("Connection Closed!!");
         server.close();
     }
     
